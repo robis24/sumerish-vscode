@@ -61,6 +61,11 @@ The linter enforces the Sumerish precedence rule in `.sum` files, Markdown code 
 Login-is-me   ⚠  '-me' (slot 1) must come before '-is' (slot 4)
 ```
 
+---
+## Demo
+
+Try the demo → https://robis24.github.io/sumerish-vscode/
+
 ### Variable name type contracts (JS / TS)
 
 When you adopt Sumerish naming in your code, the extension enforces the implied type contract:
