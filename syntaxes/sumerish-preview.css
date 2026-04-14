@@ -1,0 +1,24 @@
+.sumerish-preview {
+  background: #1e1e1e;
+  border-radius: 4px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  margin: 0.5em 0;
+}
+
+.sumerish-preview code {
+  font-family: var(--vscode-editor-font-family, 'Menlo', 'Monaco', monospace);
+  font-size: 0.9em;
+  color: #e5e7eb;
+  background: transparent;
+  padding: 0;
+}
+
+.sum-root      { color: #e5e7eb; }
+.sum-tense     { color: #f59e0b; }
+.sum-negation  { color: #ef4444; }
+.sum-plural    { color: #60a5fa; }
+.sum-owner     { color: #a78bfa; }
+.sum-spatial   { color: #2dd4bf; }
+.sum-social    { color: #4ade80; }
+.sum-regarding { color: #fb923c; }

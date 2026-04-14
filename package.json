@@ -1,0 +1,94 @@
+{
+  "name": "sumerish",
+  "displayName": "Sumerish",
+  "description": "Logic-first protocol — syntax highlighting, hover tooltips, autocomplete, and linting for Sumerish",
+  "version": "0.1.0",
+  "publisher": "sumerish",
+  "repository": { "type": "git", "url": "https://github.com/sumerish/sumerish-vscode" },
+  "icon": "images/logo.png",
+  "engines": { "vscode": "^1.85.0", "node": ">=22.0.0" },
+  "categories": ["Programming Languages", "Linters", "Snippets"],
+  "extensionDependencies": ["vscode.markdown-language-features"],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "sumerish",
+        "aliases": ["Sumerish", "sumerish"],
+        "extensions": [".sum"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "sumerish",
+        "scopeName": "source.sumerish",
+        "path": "./syntaxes/sumerish.tmLanguage.json"
+      },
+      {
+        "scopeName": "markdown.sumerish.codeblock",
+        "path": "./syntaxes/sumerish.markdown.json",
+        "injectTo": ["text.html.markdown"],
+        "embeddedLanguages": { "meta.embedded.block.sumerish": "sumerish" }
+      }
+    ],
+    "configuration": {
+      "title": "Sumerish",
+      "properties": {
+        "sumerish.showHyphens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show hyphen separators between tokens (disable for color-only mode)"
+        },
+        "sumerish.linting.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable chain-order linting in .sum and markdown files"
+        },
+        "sumerish.linting.names": {
+          "type": "boolean",
+          "default": true,
+          "description": "Lint Sumerish suffix ordering and type contracts in JS/TS variable and function names"
+        }
+      }
+    },
+    "semanticTokenTypes": [
+      { "id": "sumerishRoot",      "description": "Root word" },
+      { "id": "sumerishTense",     "description": "Tense/state suffix (-do, -ed, -will, -is)" },
+      { "id": "sumerishNegation",  "description": "Negation suffix (-no)" },
+      { "id": "sumerishPlural",    "description": "Plural suffix (-en)" },
+      { "id": "sumerishOwner",     "description": "Ownership suffix (-me)" },
+      { "id": "sumerishSpatial",   "description": "Spatial suffix (-in, -go, -ex)" },
+      { "id": "sumerishSocial",    "description": "Social suffix (-q, -pl)" },
+      { "id": "sumerishRegarding", "description": "Regarding suffix (-re)" }
+    ],
+    "configurationDefaults": {
+      "editor.semanticTokenColorCustomizations": {
+        "rules": {
+          "sumerishRoot":      "#e5e7eb",
+          "sumerishTense":     "#f59e0b",
+          "sumerishNegation":  "#ef4444",
+          "sumerishPlural":    "#60a5fa",
+          "sumerishOwner":     "#a78bfa",
+          "sumerishSpatial":   "#2dd4bf",
+          "sumerishSocial":    "#4ade80",
+          "sumerishRegarding": "#fb923c"
+        }
+      }
+    },
+    "markdown.markdownItPlugins": true,
+    "markdown.previewStyles": ["./syntaxes/sumerish-preview.css"],
+    "commands": []
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^6.0.0"
+  }
+}

@@ -1,0 +1,5 @@
+node_modules/
+out/
+*.vsix
+eslint-plugin-sumerish/node_modules/
+eslint-plugin-sumerish/dist/

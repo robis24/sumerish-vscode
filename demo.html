@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sumerish Demo</title>
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --border: #2a2a2a;
+    --text: #e0e0e0;
+    --muted: #555;
+    --hyphen: #444;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Fira Code', 'Cascadia Code', monospace; font-size: 14px; line-height: 1.6; }
+
+  /* ── page-header ────────────────────────────────────────────── */
+  .page-header { padding: 24px 32px; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; gap: 16px; }
+  .page-header__title { font-size: 18px; font-weight: 600; letter-spacing: .04em; }
+  .page-header__subtitle { color: var(--muted); font-size: 12px; }
+
+  /* ── demo-layout ────────────────────────────────────────────── */
+  .demo-layout { display: grid; grid-template-columns: 1fr 340px; gap: 0; height: calc(100vh - 65px); }
+  .demo-layout__main { padding: 24px 32px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+  .demo-layout__sidebar { border-left: 1px solid var(--border); padding: 24px; overflow-y: auto; }
+  .demo-layout__sidebar-heading { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 14px; }
+
+  /* ── field ──────────────────────────────────────────────────── */
+  .field__label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+  .field__input {
+    width: 100%; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-family: inherit; font-size: 14px; resize: vertical;
+    min-height: 80px; outline: none;
+  }
+  .field__input:focus { border-color: #555; }
+
+  /* ── controls ───────────────────────────────────────────────── */
+  .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+  /* ── toggle ─────────────────────────────────────────────────── */
+  .toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 13px; color: var(--muted); }
+  .toggle__input { display: none; }
+  .toggle__track {
+    width: 36px; height: 20px; background: var(--border); border-radius: 999px;
+    position: relative; transition: background .2s;
+  }
+  .toggle__input:checked + .toggle__track { background: #4a6; }
+  .toggle__track::after {
+    content: ''; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px;
+    background: #fff; border-radius: 999px; transition: left .2s;
+  }
+  .toggle__input:checked + .toggle__track::after { left: 19px; }
+
+  /* ── output ─────────────────────────────────────────────────── */
+  .output {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+    padding: 16px 18px; min-height: 60px; font-size: 20px; line-height: 1.8; word-break: break-word;
+  }
+
+  /* ── chain ──────────────────────────────────────────────────── */
+  .chain { display: flex; flex-wrap: wrap; gap: 6px; min-height: 36px; }
+
+  /* ── pill ───────────────────────────────────────────────────── */
+  .pill {
+    display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px;
+    border-radius: 999px; font-size: 12px; font-weight: 500;
+    background: color-mix(in srgb, var(--pill-color) 15%, transparent);
+    color: var(--pill-color); border: 1px solid color-mix(in srgb, var(--pill-color) 30%, transparent);
+  }
+  .pill__label { font-size: 10px; opacity: .7; }
+
+  /* ── suffix-ref ─────────────────────────────────────────────── */
+  .suffix-ref { display: flex; flex-direction: column; gap: 3px; margin-bottom: 24px; }
+  .suffix-ref__row { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 4px 0; }
+  .suffix-ref__badge {
+    font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 4px; min-width: 52px; text-align: center;
+    background: color-mix(in srgb, var(--badge-color) 15%, transparent);
+    color: var(--badge-color); border: 1px solid color-mix(in srgb, var(--badge-color) 30%, transparent);
+  }
+  .suffix-ref__desc { color: var(--muted); }
+
+  /* ── examples ───────────────────────────────────────────────── */
+  .examples { display: flex; flex-direction: column; gap: 8px; }
+
+  /* ── example ────────────────────────────────────────────────── */
+  .example { padding: 8px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: border-color .15s; }
+  .example:hover { border-color: #444; }
+  .example__source { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* ── token ──────────────────────────────────────────────────── */
+  .token { color: var(--tc, inherit); }
+  .token--hyphen { color: var(--hyphen); }
+
+  /* ── precedence ─────────────────────────────────────────────── */
+  .precedence { font-size: 11px; color: var(--muted); padding: 8px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 16px; }
+  .precedence__slot { color: var(--text); }
+
+  /* ── divider ────────────────────────────────────────────────── */
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h1 class="page-header__title">Sumerish</h1>
+  <p class="page-header__subtitle">Logic-first protocol · Lossless Caveman</p>
+</header>
+
+<div class="demo-layout">
+  <div class="demo-layout__main">
+
+    <div class="controls">
+      <span class="field__label" style="margin:0">Display mode:</span>
+      <label class="toggle">
+        <input class="toggle__input" type="checkbox" id="hyphen-toggle" checked>
+        <span class="toggle__track"></span>
+        Show hyphens
+      </label>
+    </div>
+
+    <div>
+      <label class="field__label" for="input">Input (plain English or Sumerish)</label>
+      <textarea class="field__input" id="input" placeholder="e.g. Login-me-is.  or  I am logged in." rows="3"></textarea>
+    </div>
+
+    <div>
+      <span class="field__label">Colored output</span>
+      <div class="output" id="output"><span style="color:var(--muted)">Start typing above…</span></div>
+    </div>
+
+    <div>
+      <span class="field__label">Chain breakdown</span>
+      <div class="chain" id="chain"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div>
+      <span class="field__label">Examples — click to load</span>
+      <div class="examples" id="examples"></div>
+    </div>
+
+  </div>
+
+  <div class="demo-layout__sidebar">
+    <div class="precedence">
+      Precedence:
+      <span class="precedence__slot">Root</span> →
+      <span class="precedence__slot">Plural/Owner</span> →
+      <span class="precedence__slot">Action/Neg</span> →
+      <span class="precedence__slot">Tense/State</span> →
+      <span class="precedence__slot">Social</span>
+    </div>
+
+    <h2 class="demo-layout__sidebar-heading">Suffix reference</h2>
+    <div class="suffix-ref" id="suffix-ref"></div>
+  </div>
+</div>
+
+<script>
+// ─── Single source of truth ───────────────────────────────────────────────────
+const SUFFIX_COLORS = {
+  // Tense / State — amber
+  'do':   '#f59e0b',
+  'ed':   '#f59e0b',
+  'will': '#f59e0b',
+  'is':   '#f59e0b',
+  // Negation — red
+  'no':   '#ef4444',
+  // Plural — blue
+  'en':   '#60a5fa',
+  // Ownership — purple
+  'me':   '#a78bfa',
+  // Spatial — teal
+  'in':   '#2dd4bf',
+  'go':   '#2dd4bf',
+  'ex':   '#2dd4bf',
+  // Social — green
+  'q':    '#4ade80',
+  'pl':   '#4ade80',
+  // Regarding — orange
+  're':   '#fb923c',
+};
+
+const SUFFIX_DESCS = {
+  'do': 'Action',   'ed': 'Past',      'will': 'Future', 'is': 'State',
+  'no': 'Negation', 'en': 'Plural',    'me': 'My/Owner',
+  'in': 'Location', 'go': 'Direction', 'ex': 'Source',
+  'q':  'Query',    'pl': 'Polite',    're': 'Regarding',
+};
+
+const ROOT_COLOR = '#e5e7eb';
+
+const EXAMPLES = [
+  { sumerish: 'Login-me-is.',          english: 'I am logged in.' },
+  { sumerish: 'Report-view-pl-q?',     english: 'Could you please view the report?' },
+  { sumerish: 'Office-in Meet-will.',  english: 'There will be a meeting in the office.' },
+  { sumerish: 'Cart-me Item-en-5-is.', english: 'My cart has 5 items.' },
+  { sumerish: 'Checkout-work-no-ed.',  english: 'Checkout did not work.' },
+  { sumerish: 'File-send-do.',         english: 'Sending the file.' },
+  { sumerish: 'Server-go Deploy-will.', english: 'Will deploy to server.' },
+];
+
+// ─── Parse ────────────────────────────────────────────────────────────────────
+function parseInputQ(text) {
+  return text.trim().split(/\s+/).map(word => {
+    const clean = word.replace(/[.,!?;:]+$/, '');
+    const punct = word.slice(clean.length);
+    const parts = clean.split('-').map((segment, index) => {
+      const lowercased = segment.toLowerCase();
+      const color = index === 0 ? ROOT_COLOR : (SUFFIX_COLORS[lowercased] || ROOT_COLOR);
+      return { text: segment, suffix: index === 0 ? null : lowercased, color };
+    });
+    return { parts, punct };
+  });
+}
+
+const capitalizeQ = text => text.length ? text[0].toUpperCase() + text.slice(1) : text;
+
+// ─── Token HTML builder ───────────────────────────────────────────────────────
+function tokenHtmlQ(part, index, showHyphensIs) {
+  const separator = (index > 0 && showHyphensIs) ? `<span class="token--hyphen">-</span>` : '';
+  const label = (!showHyphensIs && index > 0) ? capitalizeQ(part.text) : part.text;
+  return `${separator}<span class="token" style="--tc:${part.color}">${label}</span>`;
+}
+
+// ─── Render output ────────────────────────────────────────────────────────────
+function renderOutputDo(parsed, showHyphensIs) {
+  const outputEl = document.getElementById('output');
+  if (!parsed.length || (parsed.length === 1 && !parsed[0].parts[0].text)) {
+    outputEl.innerHTML = '<span style="color:var(--muted)">Start typing above…</span>';
+    return;
+  }
+  outputEl.innerHTML = parsed.map(({ parts, punct }, wordIndex) => {
+    const tokensHtml = parts.map((part, index) => tokenHtmlQ(part, index, showHyphensIs)).join('');
+    const space = wordIndex < parsed.length - 1 ? ' ' : '';
+    return `${tokensHtml}<span style="color:var(--muted)">${punct}</span>${space}`;
+  }).join('');
+}
+
+// ─── Render chain ─────────────────────────────────────────────────────────────
+function renderChainDo(parsed) {
+  document.getElementById('chain').innerHTML = parsed
+    .flatMap(({ parts }) => parts.map(part => {
+      const label = part.suffix ? `-${part.suffix}` : part.text;
+      const description = part.suffix ? (SUFFIX_DESCS[part.suffix] || part.suffix) : 'root';
+      return `<span class="pill" style="--pill-color:${part.color}">${label}<span class="pill__label">${description}</span></span>`;
+    }))
+    .join('');
+}
+
+// ─── Render suffix reference ──────────────────────────────────────────────────
+function renderSuffixRefDo() {
+  document.getElementById('suffix-ref').innerHTML = Object.entries(SUFFIX_DESCS)
+    .map(([suffix, description]) => {
+      const color = SUFFIX_COLORS[suffix] || ROOT_COLOR;
+      return `<div class="suffix-ref__row">
+        <span class="suffix-ref__badge" style="--badge-color:${color}">-${suffix}</span>
+        <span class="suffix-ref__desc">${description}</span>
+      </div>`;
+    }).join('');
+}
+
+// ─── Render examples ──────────────────────────────────────────────────────────
+function renderExamplesDo() {
+  const showHyphensIs = document.getElementById('hyphen-toggle').checked;
+
+  document.getElementById('examples').innerHTML = EXAMPLES.map(({ sumerish, english }) => {
+    const parsed = parseInputQ(sumerish);
+    const coloredHtml = parsed.map(({ parts, punct }) => {
+      const tokensHtml = parts.map((part, index) => tokenHtmlQ(part, index, showHyphensIs)).join('');
+      return `${tokensHtml}<span style="color:var(--muted)">${punct}</span>`;
+    }).join(' ');
+
+    return `<div class="example" onclick="document.getElementById('input').value='${sumerish.replace(/'/g,"\\'")}'; onInputDo()">
+      <div>${coloredHtml}</div>
+      <div class="example__source">${english}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── Wire up ──────────────────────────────────────────────────────────────────
+function onInputDo() {
+  const text = document.getElementById('input').value;
+  const showHyphensIs = document.getElementById('hyphen-toggle').checked;
+  if (!text.trim()) {
+    document.getElementById('output').innerHTML = '<span style="color:var(--muted)">Start typing above…</span>';
+    document.getElementById('chain').innerHTML = '';
+    return;
+  }
+  const parsed = parseInputQ(text);
+  renderOutputDo(parsed, showHyphensIs);
+  renderChainDo(parsed);
+}
+
+document.getElementById('input').addEventListener('input', onInputDo);
+document.getElementById('hyphen-toggle').addEventListener('change', () => {
+  onInputDo();
+  renderExamplesDo();
+});
+
+// Init
+renderSuffixRefDo();
+renderExamplesDo();
+</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "eslint-plugin-sumerish",
+  "version": "0.1.0",
+  "description": "ESLint plugin enforcing Sumerish naming conventions and type contracts on variable and function identifiers",
+  "repository": { "type": "git", "url": "https://github.com/sumerish/eslint-plugin-sumerish" },
+  "engines": { "node": ">=22.0.0" },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "keywords": ["eslint", "eslint-plugin", "sumerish", "naming"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node tests/naming.test.js"
+  },
+  "peerDependencies": {
+    "eslint": ">=8.0.0"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.0.0",
+    "@types/estree": "^1.0.0",
+    "@types/node": "^22.0.0",
+    "eslint": "^8.0.0",
+    "typescript": "^6.0.0"
+  }
+}

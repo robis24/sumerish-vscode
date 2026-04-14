@@ -1,0 +1,79 @@
+{
+  "name": "Sumerish",
+  "scopeName": "source.sumerish",
+  "fileTypes": ["sum"],
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#context-header" },
+    { "include": "#chain-token" },
+    { "include": "#punctuation" }
+  ],
+  "repository": {
+    "comment": {
+      "match": "//.*$",
+      "name": "comment.line.double-slash.sumerish"
+    },
+    "context-header": {
+      "match": "^\\[([^\\]]+)\\]:",
+      "captures": {
+        "0": { "name": "entity.name.section.sumerish" },
+        "1": { "name": "string.unquoted.sumerish" }
+      }
+    },
+    "chain-token": {
+      "comment": "A full chain like Login-me-is or Report-view-pl-q",
+      "match": "([A-Za-z][A-Za-z0-9]*)((?:-(?:do|ed|will|is|no|en|me|in|go|ex|q|pl|re))*)",
+      "captures": {
+        "1": { "name": "variable.other.sumerish.root" },
+        "2": {
+          "patterns": [
+            { "include": "#suffix-tense" },
+            { "include": "#suffix-negation" },
+            { "include": "#suffix-plural" },
+            { "include": "#suffix-owner" },
+            { "include": "#suffix-spatial" },
+            { "include": "#suffix-social" },
+            { "include": "#suffix-regarding" },
+            { "include": "#hyphen" }
+          ]
+        }
+      }
+    },
+    "suffix-tense": {
+      "match": "(?<=-)(?:do|ed|will|is)(?=-|$|[.,!?])",
+      "name": "keyword.other.tense.sumerish"
+    },
+    "suffix-negation": {
+      "match": "(?<=-)no(?=-|$|[.,!?])",
+      "name": "keyword.other.negation.sumerish"
+    },
+    "suffix-plural": {
+      "match": "(?<=-)en(?=-|$|[.,!?])",
+      "name": "keyword.other.plural.sumerish"
+    },
+    "suffix-owner": {
+      "match": "(?<=-)me(?=-|$|[.,!?])",
+      "name": "keyword.other.owner.sumerish"
+    },
+    "suffix-spatial": {
+      "match": "(?<=-)(?:in|go|ex)(?=-|$|[.,!?])",
+      "name": "keyword.other.spatial.sumerish"
+    },
+    "suffix-social": {
+      "match": "(?<=-)(?:q|pl)(?=-|$|[.,!?])",
+      "name": "keyword.other.social.sumerish"
+    },
+    "suffix-regarding": {
+      "match": "(?<=-)re(?=-|$|[.,!?])",
+      "name": "keyword.other.regarding.sumerish"
+    },
+    "hyphen": {
+      "match": "-",
+      "name": "punctuation.separator.sumerish"
+    },
+    "punctuation": {
+      "match": "[.,!?;:]",
+      "name": "punctuation.terminator.sumerish"
+    }
+  }
+}
