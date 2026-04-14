@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-sumerish",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "ESLint plugin enforcing Sumerish naming conventions and type contracts on variable and function identifiers",
   "repository": { "type": "git", "url": "https://github.com/sumerish/eslint-plugin-sumerish" },
   "engines": { "node": ">=22.0.0" },

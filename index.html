@@ -100,6 +100,48 @@
 
   /* ── divider ────────────────────────────────────────────────── */
   .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+  /* ── sidebar toggle button (mobile only) ────────────────────── */
+  .page-header__sidebar-btn {
+    display: none; margin-left: auto; background: none; border: 1px solid var(--border);
+    color: var(--text); border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 16px;
+    line-height: 1; transition: border-color .15s;
+  }
+  .page-header__sidebar-btn:hover { border-color: #555; }
+
+  /* ── overlay backdrop ───────────────────────────────────────── */
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6);
+    z-index: 10; backdrop-filter: blur(2px);
+  }
+  .sidebar-overlay--visible { display: block; }
+
+  /* ── mobile ─────────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .page-header { padding: 16px 18px; }
+    .page-header__sidebar-btn { display: block; }
+
+    .demo-layout { grid-template-columns: 1fr; height: auto; }
+    .demo-layout__main { padding: 18px; }
+
+    .demo-layout__sidebar {
+      position: fixed; top: 0; right: -100%; width: min(320px, 90vw); height: 100vh;
+      border-left: 1px solid var(--border); background: var(--bg);
+      z-index: 20; transition: right .25s ease; padding: 20px; overflow-y: auto;
+    }
+    .demo-layout__sidebar--open { right: 0; }
+
+    .demo-layout__sidebar-close { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+    .demo-layout__sidebar-close button {
+      background: none; border: none; color: var(--muted); font-size: 20px;
+      cursor: pointer; padding: 4px 8px; line-height: 1;
+    }
+    .demo-layout__sidebar-close button:hover { color: var(--text); }
+  }
+
+  @media (min-width: 641px) {
+    .demo-layout__sidebar-close { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -107,7 +149,10 @@
 <header class="page-header">
   <h1 class="page-header__title">Sumerish</h1>
   <p class="page-header__subtitle">Logic-first protocol · Lossless Caveman</p>
+  <button class="page-header__sidebar-btn" onclick="sidebarToggleDo()" aria-label="Suffix reference">☰</button>
 </header>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="sidebarCloseDo()"></div>
 
 <div class="demo-layout">
   <div class="demo-layout__main">
@@ -123,29 +168,32 @@
 
     <div>
       <label class="field__label" for="input">Input (plain English or Sumerish)</label>
-      <textarea class="field__input" id="input" placeholder="e.g. Login-me-is.  or  I am logged in." rows="3"></textarea>
+      <textarea class="field__input" id="text-input" placeholder="e.g. Login-me-is.  or  I am logged in." rows="3"></textarea>
     </div>
 
     <div>
       <span class="field__label">Colored output</span>
-      <div class="output" id="output"><span style="color:var(--muted)">Start typing above…</span></div>
+      <div class="output" id="color-output"><span style="color:var(--muted)">Start typing above…</span></div>
     </div>
 
     <div>
       <span class="field__label">Chain breakdown</span>
-      <div class="chain" id="chain"></div>
+      <div class="chain" id="chain-breakdown"></div>
     </div>
 
     <div class="divider"></div>
 
     <div>
       <span class="field__label">Examples — click to load</span>
-      <div class="examples" id="examples"></div>
+      <div class="examples" id="examples-list"></div>
     </div>
 
   </div>
 
-  <div class="demo-layout__sidebar">
+  <div class="demo-layout__sidebar" id="suffix-sidebar">
+    <div class="demo-layout__sidebar-close">
+      <button onclick="sidebarCloseDo()" aria-label="Close">✕</button>
+    </div>
     <div class="precedence">
       Precedence:
       <span class="precedence__slot">Root</span> →
@@ -229,7 +277,7 @@ function tokenHtmlQ(part, index, showHyphensIs) {
 
 // ─── Render output ────────────────────────────────────────────────────────────
 function renderOutputDo(parsed, showHyphensIs) {
-  const outputEl = document.getElementById('output');
+  const outputEl = document.getElementById('color-output');
   if (!parsed.length || (parsed.length === 1 && !parsed[0].parts[0].text)) {
     outputEl.innerHTML = '<span style="color:var(--muted)">Start typing above…</span>';
     return;
@@ -243,7 +291,7 @@ function renderOutputDo(parsed, showHyphensIs) {
 
 // ─── Render chain ─────────────────────────────────────────────────────────────
 function renderChainDo(parsed) {
-  document.getElementById('chain').innerHTML = parsed
+  document.getElementById('chain-breakdown').innerHTML = parsed
     .flatMap(({ parts }) => parts.map(part => {
       const label = part.suffix ? `-${part.suffix}` : part.text;
       const description = part.suffix ? (SUFFIX_DESCS[part.suffix] || part.suffix) : 'root';
@@ -268,14 +316,14 @@ function renderSuffixRefDo() {
 function renderExamplesDo() {
   const showHyphensIs = document.getElementById('hyphen-toggle').checked;
 
-  document.getElementById('examples').innerHTML = EXAMPLES.map(({ sumerish, english }) => {
+  document.getElementById('examples-list').innerHTML = EXAMPLES.map(({ sumerish, english }) => {
     const parsed = parseInputQ(sumerish);
     const coloredHtml = parsed.map(({ parts, punct }) => {
       const tokensHtml = parts.map((part, index) => tokenHtmlQ(part, index, showHyphensIs)).join('');
       return `${tokensHtml}<span style="color:var(--muted)">${punct}</span>`;
     }).join(' ');
 
-    return `<div class="example" onclick="document.getElementById('input').value='${sumerish.replace(/'/g,"\\'")}'; onInputDo()">
+    return `<div class="example" onclick="document.getElementById('text-input').value='${sumerish.replace(/'/g,"\\'")}'; onInputDo()">
       <div>${coloredHtml}</div>
       <div class="example__source">${english}</div>
     </div>`;
@@ -284,11 +332,11 @@ function renderExamplesDo() {
 
 // ─── Wire up ──────────────────────────────────────────────────────────────────
 function onInputDo() {
-  const text = document.getElementById('input').value;
+  const text = document.getElementById('text-input').value;
   const showHyphensIs = document.getElementById('hyphen-toggle').checked;
   if (!text.trim()) {
-    document.getElementById('output').innerHTML = '<span style="color:var(--muted)">Start typing above…</span>';
-    document.getElementById('chain').innerHTML = '';
+    document.getElementById('color-output').innerHTML = '<span style="color:var(--muted)">Start typing above…</span>';
+    document.getElementById('chain-breakdown').innerHTML = '';
     return;
   }
   const parsed = parseInputQ(text);
@@ -296,7 +344,17 @@ function onInputDo() {
   renderChainDo(parsed);
 }
 
-document.getElementById('input').addEventListener('input', onInputDo);
+function sidebarToggleDo() {
+  document.getElementById('suffix-sidebar').classList.toggle('demo-layout__sidebar--open');
+  document.getElementById('sidebar-overlay').classList.toggle('sidebar-overlay--visible');
+}
+
+function sidebarCloseDo() {
+  document.getElementById('suffix-sidebar').classList.remove('demo-layout__sidebar--open');
+  document.getElementById('sidebar-overlay').classList.remove('sidebar-overlay--visible');
+}
+
+document.getElementById('text-input').addEventListener('text-input', onInputDo);
 document.getElementById('hyphen-toggle').addEventListener('change', () => {
   onInputDo();
   renderExamplesDo();

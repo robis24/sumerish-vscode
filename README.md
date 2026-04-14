@@ -62,6 +62,7 @@ Login-is-me   ⚠  '-me' (slot 1) must come before '-is' (slot 4)
 ```
 
 ---
+
 ## Demo
 
 Try the demo → https://robis24.github.io/sumerish-vscode/
@@ -75,12 +76,6 @@ const loginIs = []; // ⚠  -is implies boolean, assigned array
 const fetchWill = () => {}; // ⚠  -will implies Promise, function is not async
 const processDo = () => x; // ⚠  -do implies void, use -q for queries
 ```
-
-### Sumerish commit messages
-
-Run **Sumerish: Generate Commit Message** to open your staged diff alongside a Sumerish composition template.
-
----
 
 ## Suffix reference
 
